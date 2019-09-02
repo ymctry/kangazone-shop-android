@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.content.IntentFilter;
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
@@ -34,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
     private ResultReceiver resultReceiver;
     private WaitingDialog waitingDialog;
 
+    private String isBack; // 0能返回，1不能返回
+
+    private String url = "http://172.16.0.250:8080/";
 
 
     @Override
@@ -43,21 +47,24 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         registerResultReceiver();
+
+        binding.acetGetUrl.setText(url);
     }
 
     private void initView() {
-        WebSettings settings =  binding.wvShop.getSettings();
+        WebSettings settings = binding.wvShop.getSettings();
 
         settings.setJavaScriptEnabled(true);
         settings.setDefaultTextEncodingName("utf-8");
         settings.setDomStorageEnabled(true);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
 
         //防止弹出系统浏览器提示
         settings.setSupportMultipleWindows(true);
 
         settings.setSupportZoom(true);
-        binding.wvShop.loadUrl("http://172.16.0.250:8080/test");
+        binding.wvShop.loadUrl(url);
         binding.wvShop.addJavascriptInterface(this, "$App");
         binding.wvShop.setWebViewClient(new WebViewClient() {
 
@@ -89,6 +96,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+
+        binding.acbSetUrl.setOnClickListener(view -> {
+            url = binding.acetGetUrl.getText().toString();
+            binding.wvShop.loadUrl(url);
+        });
     }
 
     @JavascriptInterface
@@ -99,8 +111,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @JavascriptInterface
-    public void javaCallJS(String result){
-        binding.wvShop.post(() -> binding.wvShop.evaluateJavascript("javascript:callJsFunction('"+result+"')", new ValueCallback<String>() {
+    public void javaCallJS(String result) {
+        binding.wvShop.post(() -> binding.wvShop.evaluateJavascript("javascript:sendJSMessage('" + result + "')", new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String value) {
                 //此处为 js 返回的结果
@@ -109,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 调用消费接口，交易类型00表示消费
-    private void consumption(){
+    private void consumption() {
         waitingDialog = new WaitingDialog(this);
         waitingDialog.show();
         Request request = new Request();
@@ -127,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
         }
         request.amount = amount;
         // Saas软件订单号
-        request.orderId ="1234";
+        request.orderId = "1234";
         // 商品信息
         request.orderInfo = "1244";
         // 支付码
@@ -154,16 +166,17 @@ public class MainActivity extends AppCompatActivity {
             public void callFail() {
                 PaymentService.getInstance().init(getApplication());
 
-                Toast.makeText(getApplicationContext(),"交易失败，请重试",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "交易失败，请重试", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void callSuccess() {
 
-                Toast.makeText(getApplicationContext(),"交易成功",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "交易成功", Toast.LENGTH_LONG).show();
             }
         });
     }
+
     private void registerResultReceiver() {
         resultReceiver = new ResultReceiver(result -> {
             if (waitingDialog != null && waitingDialog.isShowing()) {
@@ -182,5 +195,18 @@ public class MainActivity extends AppCompatActivity {
         if (resultReceiver != null) {
             unregisterReceiver(resultReceiver);
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        String str = "{'resultCode':'-1','resultMsg':'isBack'}";
+        binding.wvShop.post(() -> binding.wvShop.evaluateJavascript("javascript:sendJSMessage('" + str + "')", value -> {
+            //此处为 js 返回的结果
+            isBack = value;
+        }));
+        if (isBack.equals("1")) {
+            finish();
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
