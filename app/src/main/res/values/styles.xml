@@ -1,0 +1,37 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="QMUI.Compat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">?attr/qmui_config_color_blue</item>
+        <item name="colorPrimaryDark">?attr/qmui_config_color_blue</item>
+        <item name="colorAccent">?attr/qmui_config_color_blue</item>
+
+        <item name="QMUITopBarStyle">@style/QDTopBar</item>
+
+        <!-- 配置app自己的theme -->
+        <item name="app_primary_color">?attr/qmui_config_color_blue</item>
+        <item name="app_content_bg_color">@color/qmui_config_color_white</item>
+    </style>
+
+    <style name="QDTopBar" parent="QMUI.TopBar">
+        <item name="qmui_topbar_bg_color">?attr/app_primary_color</item>
+        <item name="qmui_topbar_title_color">@color/qmui_config_color_white</item>
+        <item name="qmui_topbar_subtitle_color">@color/qmui_config_color_white</item>
+        <item name="qmui_topbar_text_btn_color_state_list">@color/s_topbar_btn_color</item>
+        <item name="qmui_topbar_height">48dp</item>
+        <item name="qmui_topbar_image_btn_height">48dp</item>
+    </style>
+
+    <style name="defaultDialogStyle" parent="@android:style/Theme.Holo.Light.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.5</item>
+    </style>
+
+</resources>
