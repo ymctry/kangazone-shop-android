@@ -1,0 +1,1 @@
+# kangazone-shop-android
