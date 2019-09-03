@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     @JavascriptInterface
     public String jsCallAndroid(String msg) {
         //Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-        consumption();
+        consumption(msg);
         return "android返回值";
     }
 
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 调用消费接口，交易类型00表示消费
-    private void consumption() {
+    private void consumption(String message) {
         waitingDialog = new WaitingDialog(this);
         waitingDialog.show();
         Request request = new Request();
