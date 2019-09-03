@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     private ResultReceiver resultReceiver;
-    private WaitingDialog waitingDialog;
+    //private WaitingDialog waitingDialog;
 
     private String isBack; // 0能返回，1不能返回
 
@@ -122,8 +122,8 @@ public class MainActivity extends AppCompatActivity {
 
     // 调用消费接口，交易类型00表示消费
     private void consumption(String message) {
-        waitingDialog = new WaitingDialog(this);
-        waitingDialog.show();
+        //waitingDialog = new WaitingDialog(this);
+        //waitingDialog.show();
         Request request = new Request();
         // 应用类型
         request.appType = "test";
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
         Gson gson = new Gson();
         String jsonStr = gson.toJson(request);
-        PaymentService.getInstance().callPayment(jsonStr, new PaymentService.PaymentCallback() {
+        PaymentService.getInstance().callPayment(message, new PaymentService.PaymentCallback() {
             @Override
             public void callFail() {
                 PaymentService.getInstance().init(getApplication());
@@ -179,9 +179,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void registerResultReceiver() {
         resultReceiver = new ResultReceiver(result -> {
-            if (waitingDialog != null && waitingDialog.isShowing()) {
+            /*if (waitingDialog != null && waitingDialog.isShowing()) {
                 waitingDialog.dismiss();
-            }
+            }*/
             javaCallJS(result);
         });
         IntentFilter intentFilter = new IntentFilter();
