@@ -131,7 +131,8 @@ public class MainActivity extends AppCompatActivity {
         }));
     }
 
-    private void jsOpenDrawer() {
+    @JavascriptInterface
+    public void jsOpenDrawer() {
         AidlUtil.getInstance().openDrawer();
     }
 
