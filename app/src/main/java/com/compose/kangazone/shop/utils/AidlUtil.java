@@ -88,8 +88,36 @@ public class AidlUtil {
             return;
         }
         try {
-            woyouService.sendRAWData(ESCUtil.openDrawer(), null);
-            woyouService.openDrawer(null);
+            woyouService.sendRAWData(ESCUtil.openDrawer(), new ICallback() {
+                @Override
+                public void onRunResult(boolean isSuccess, int code, String msg) throws RemoteException {
+                    if(isSuccess){
+                        Log.i("============",msg);
+                    }else{
+                        Log.i("xxxxxxxxxxx","失败");
+                    }
+                }
+
+                @Override
+                public IBinder asBinder() {
+                    return null;
+                }
+            });
+            woyouService.openDrawer(new ICallback() {
+                @Override
+                public void onRunResult(boolean isSuccess, int code, String msg) throws RemoteException {
+                    if(isSuccess){
+                        Log.i("============",msg);
+                    }else{
+                        Log.i("xxxxxxxxxxx","失败");
+                    }
+                }
+
+                @Override
+                public IBinder asBinder() {
+                    return null;
+                }
+            });
         } catch (RemoteException e) {
             e.printStackTrace();
         }
