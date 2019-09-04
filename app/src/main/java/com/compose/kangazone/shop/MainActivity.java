@@ -6,9 +6,12 @@ import androidx.databinding.DataBindingUtil;
 import android.annotation.SuppressLint;
 import android.content.IntentFilter;
 import android.net.http.SslError;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
@@ -24,8 +27,13 @@ import com.compose.kangazone.shop.bean.Request;
 import com.compose.kangazone.shop.databinding.ActivityMainBinding;
 import com.compose.kangazone.shop.dialog.WaitingDialog;
 import com.compose.kangazone.shop.receiver.ResultReceiver;
+import com.compose.kangazone.shop.utils.AidlUtil;
+import com.compose.kangazone.shop.utils.BluetoothUtil;
+import com.compose.kangazone.shop.utils.ESCUtil;
 import com.google.gson.Gson;
 import com.sunmi.payment.PaymentService;
+
+import java.io.IOException;
 
 @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
 public class MainActivity extends AppCompatActivity {
@@ -33,12 +41,10 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     private ResultReceiver resultReceiver;
-    //private WaitingDialog waitingDialog;
 
     private String isBack; // 0能返回，1不能返回
 
-    private String url = "http://172.16.0.250:8080/";
-
+    private String url = "http://172.16.0.250:8081/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,25 +58,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        WebSettings settings = binding.wvShop.getSettings();
 
-        settings.setJavaScriptEnabled(true);
-        settings.setDefaultTextEncodingName("utf-8");
-        settings.setDomStorageEnabled(true);
-        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        settings.setJavaScriptCanOpenWindowsAutomatically(true);
-
-        //防止弹出系统浏览器提示
-        settings.setSupportMultipleWindows(true);
-
-        settings.setSupportZoom(true);
-        binding.wvShop.loadUrl(url);
-        binding.wvShop.addJavascriptInterface(this, "$App");
         binding.wvShop.setWebViewClient(new WebViewClient() {
-
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                view.loadUrl(request.getUrl().toString());
+                binding.wvShop.postDelayed(() -> view.loadUrl(request.getUrl().toString()), 500);
                 return true;
             }
 
@@ -97,10 +89,29 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
+        WebSettings settings = binding.wvShop.getSettings();
+
+        settings.setJavaScriptEnabled(true);
+        settings.setDefaultTextEncodingName("utf-8");
+        settings.setDomStorageEnabled(true);
+        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        settings.setAllowUniversalAccessFromFileURLs(true);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+
+        //防止弹出系统浏览器提示
+        settings.setSupportMultipleWindows(true);
+
+        settings.setSupportZoom(true);
+        binding.wvShop.postDelayed(() -> binding.wvShop.loadUrl(url), 500);
+
+        binding.wvShop.addJavascriptInterface(this, "$App");
+
         binding.acbSetUrl.setOnClickListener(view -> {
             url = binding.acetGetUrl.getText().toString();
             binding.wvShop.loadUrl(url);
         });
+
     }
 
     @JavascriptInterface
@@ -120,10 +131,12 @@ public class MainActivity extends AppCompatActivity {
         }));
     }
 
+    private void jsOpenDrawer() {
+        AidlUtil.getInstance().openDrawer();
+    }
+
     // 调用消费接口，交易类型00表示消费
     private void consumption(String message) {
-        //waitingDialog = new WaitingDialog(this);
-        //waitingDialog.show();
         Request request = new Request();
         // 应用类型
         request.appType = "test";
@@ -179,9 +192,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void registerResultReceiver() {
         resultReceiver = new ResultReceiver(result -> {
-            /*if (waitingDialog != null && waitingDialog.isShowing()) {
-                waitingDialog.dismiss();
-            }*/
             javaCallJS(result);
         });
         IntentFilter intentFilter = new IntentFilter();
@@ -189,6 +199,16 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(resultReceiver, intentFilter);
     }
 
+    // 通过蓝牙打开
+    /*private void printByBluTooth(String content) {
+        try {
+            BluetoothUtil.sendData(content.getBytes(mStrings));
+            BluetoothUtil.sendData(ESCUtil.nextLine(3));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+*/
     @Override
     protected void onDestroy() {
         super.onDestroy();
