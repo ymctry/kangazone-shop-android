@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String isBack; // 0能返回，1不能返回
 
-    private String url = "http://172.16.0.250:8081/";
+    private String url = "http://kangazone-shop.herokuapp.com/test";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -74,6 +74,7 @@ public class AidlUtil {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.i(">>>>>>>>>>>>>>>>>>","开始连接");
             woyouService = IWoyouService.Stub.asInterface(service);
         }
     };
@@ -123,7 +124,6 @@ public class AidlUtil {
         }
 
     }
-
 
 
 
