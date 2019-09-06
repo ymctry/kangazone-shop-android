@@ -180,13 +180,13 @@ public class MainActivity extends AppCompatActivity {
             public void callFail() {
                 PaymentService.getInstance().init(getApplication());
 
-                Toast.makeText(getApplicationContext(), "交易失败，请重试", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), "交易失败，请重试", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void callSuccess() {
 
-                Toast.makeText(getApplicationContext(), "交易成功", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), "交易成功", Toast.LENGTH_LONG).show();
             }
         });
     }
