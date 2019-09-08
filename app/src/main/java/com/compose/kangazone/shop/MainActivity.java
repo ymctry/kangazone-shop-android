@@ -162,9 +162,7 @@ public class MainActivity extends AppCompatActivity {
     public void jsPrint(String venderId, String text) {
         connectByUsb = new ConnectByUsb();
         connectByUsb.getConnect(this, Integer.parseInt(venderId));
-
-        String str = BytesUtil.stringToHexString("测试打印abcd123");
-
+        //String str = BytesUtil.stringToHexString("测试打印abcd123");
         connectByUsb.print(this, BytesUtil.getBytesFromHexString(text));
     }
 
