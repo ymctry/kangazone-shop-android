@@ -3,6 +3,7 @@ package com.compose.kangazone.shop;
 import android.app.Application;
 
 import com.compose.kangazone.shop.utils.AidlUtil;
+import com.compose.kangazone.shop.utils.ConnectByUsb;
 import com.sunmi.payment.PaymentService;
 
 

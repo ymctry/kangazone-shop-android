@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.IntentFilter;
+import android.hardware.usb.UsbManager;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +31,8 @@ import com.compose.kangazone.shop.dialog.WaitingDialog;
 import com.compose.kangazone.shop.receiver.ResultReceiver;
 import com.compose.kangazone.shop.utils.AidlUtil;
 import com.compose.kangazone.shop.utils.BluetoothUtil;
+import com.compose.kangazone.shop.utils.BytesUtil;
+import com.compose.kangazone.shop.utils.ConnectByUsb;
 import com.compose.kangazone.shop.utils.ESCUtil;
 import com.google.gson.Gson;
 import com.sunmi.payment.PaymentService;
@@ -41,10 +45,12 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     private ResultReceiver resultReceiver;
+    private ConnectByUsb connectByUsb;
 
     private String isBack; // 0能返回，1不能返回
 
     private String url = "http://kangazone-shop.herokuapp.com/test";
+    //https://shop.kangazone.com
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,15 +60,32 @@ public class MainActivity extends AppCompatActivity {
         initView();
         registerResultReceiver();
 
-        binding.acetGetUrl.setText(url);
     }
 
     private void initView() {
 
+        WebSettings settings = binding.wvShop.getSettings();
+
+        settings.setJavaScriptEnabled(true);
+        settings.setDefaultTextEncodingName("utf-8");
+        settings.setDomStorageEnabled(true);
+        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        settings.setAllowUniversalAccessFromFileURLs(true);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+
+        //防止弹出系统浏览器提示
+        settings.setSupportMultipleWindows(true);
+
+        settings.setSupportZoom(true);
+        binding.wvShop.loadUrl(url);
+
+        binding.wvShop.addJavascriptInterface(this, "$App");
+
         binding.wvShop.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                binding.wvShop.postDelayed(() -> view.loadUrl(request.getUrl().toString()), 500);
+                 view.loadUrl(request.getUrl().toString());
                 return true;
             }
 
@@ -87,29 +110,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-        });
-
-        WebSettings settings = binding.wvShop.getSettings();
-
-        settings.setJavaScriptEnabled(true);
-        settings.setDefaultTextEncodingName("utf-8");
-        settings.setDomStorageEnabled(true);
-        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        settings.setAllowUniversalAccessFromFileURLs(true);
-        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        settings.setJavaScriptCanOpenWindowsAutomatically(true);
-
-        //防止弹出系统浏览器提示
-        settings.setSupportMultipleWindows(true);
-
-        settings.setSupportZoom(true);
-        binding.wvShop.postDelayed(() -> binding.wvShop.loadUrl(url), 500);
-
-        binding.wvShop.addJavascriptInterface(this, "$App");
-
-        binding.acbSetUrl.setOnClickListener(view -> {
-            url = binding.acetGetUrl.getText().toString();
-            binding.wvShop.loadUrl(url);
         });
 
     }
@@ -138,57 +138,37 @@ public class MainActivity extends AppCompatActivity {
 
     // 调用消费接口，交易类型00表示消费
     private void consumption(String message) {
-        Request request = new Request();
-        // 应用类型
-        request.appType = "test";
-        // 应用包名
-        request.appId = getPackageName();
-        // 交易类型
-        request.transType = "00";
-        // 交易金额
-        Long amount = 0L;
-        try {
-            amount = Long.parseLong("1000");
-        } catch (Exception e) {
-        }
-        request.amount = amount;
-        // Saas软件订单号
-        request.orderId = "1234";
-        // 商品信息
-        request.orderInfo = "1244";
-        // 支付码
-        request.payCode = "124";
-
-
-        Config config = new Config();
-        // 交易过程中是否显示UI界面
-        config.processDisplay = false;
-        // 是否展示交易结果页
-        config.resultDisplay = false;
-        // 是否打印小票
-        config.printTicket = false;
-        // 指定签购单上的退款订单号类型
-        config.printIdType = "";
-        // 备注
-        config.remarks = "";
-        request.config = config;
-
-        Gson gson = new Gson();
-        String jsonStr = gson.toJson(request);
         PaymentService.getInstance().callPayment(message, new PaymentService.PaymentCallback() {
             @Override
             public void callFail() {
                 PaymentService.getInstance().init(getApplication());
-
-                //Toast.makeText(getApplicationContext(), "交易失败，请重试", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void callSuccess() {
-
-                //Toast.makeText(getApplicationContext(), "交易成功", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+
+    // 获取打印机驱动
+    @JavascriptInterface
+    public void jsGetDevice(String deviceName) {
+        connectByUsb = new ConnectByUsb();
+        connectByUsb.getConnect(this, deviceName);
+    }
+
+    // 打印
+    @JavascriptInterface
+    public void jsPrint(String text) {
+        connectByUsb.print(BytesUtil.getBytesFromDecString(text));
+    }
+
+    // 获取所有usb设备
+    @JavascriptInterface
+    public String jsGetAllUSBDevices(){
+        UsbManager usbManager = (UsbManager) this.getSystemService(Context.USB_SERVICE);
+        return  usbManager.getDeviceList().toString();
     }
 
     private void registerResultReceiver() {
@@ -200,16 +180,6 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(resultReceiver, intentFilter);
     }
 
-    // 通过蓝牙打开
-    /*private void printByBluTooth(String content) {
-        try {
-            BluetoothUtil.sendData(content.getBytes(mStrings));
-            BluetoothUtil.sendData(ESCUtil.nextLine(3));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-*/
     @Override
     protected void onDestroy() {
         super.onDestroy();

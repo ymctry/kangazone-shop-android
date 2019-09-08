@@ -8,39 +8,22 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-        <Button
-            android:id="@+id/acb_set_url"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="确认"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/acet_get_url" />
-
-        <EditText
-            android:id="@+id/acet_get_url"
+        <ImageView
+            android:id="@+id/aciv_bg"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:background="@mipmap/splash"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
 
         <WebView
             android:id="@+id/wv_shop"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/acb_set_url" />
-
-
-
-        <ImageView
-            android:id="@+id/aciv_bg"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@mipmap/bg"
-            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

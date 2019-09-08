@@ -89,36 +89,8 @@ public class AidlUtil {
             return;
         }
         try {
-            woyouService.sendRAWData(ESCUtil.openDrawer(), new ICallback() {
-                @Override
-                public void onRunResult(boolean isSuccess, int code, String msg) throws RemoteException {
-                    if(isSuccess){
-                        Log.i("============",msg);
-                    }else{
-                        Log.i("xxxxxxxxxxx","失败");
-                    }
-                }
-
-                @Override
-                public IBinder asBinder() {
-                    return null;
-                }
-            });
-            woyouService.openDrawer(new ICallback() {
-                @Override
-                public void onRunResult(boolean isSuccess, int code, String msg) throws RemoteException {
-                    if(isSuccess){
-                        Log.i("============",msg);
-                    }else{
-                        Log.i("xxxxxxxxxxx","失败");
-                    }
-                }
-
-                @Override
-                public IBinder asBinder() {
-                    return null;
-                }
-            });
+            woyouService.sendRAWData(ESCUtil.openDrawer(), null);
+            woyouService.openDrawer(null);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -127,10 +99,157 @@ public class AidlUtil {
 
 
 
+    public ICallback generateCB(final PrinterCallback printerCallback){
+        return new ICallback.Stub(){
+
+            @Override
+            public void onRunResult(boolean isSuccess, int code, String msg) throws RemoteException {
+
+            }
+
+            @Override
+            public void onReturnString(String result) throws RemoteException {
+
+            }
+
+            @Override
+            public void onRaiseException(int code, String msg) throws RemoteException {
+
+            }
+
+            @Override
+            public void onPrintResult(int code, String msg) throws RemoteException {
+
+            }
+        };
+    }
+
+    /**
+     * 设置打印浓度
+     */
+    private int[] darkness = new int[]{0x0600, 0x0500, 0x0400, 0x0300, 0x0200, 0x0100, 0,
+            0xffff, 0xfeff, 0xfdff, 0xfcff, 0xfbff, 0xfaff};
+
+    public void setDarkness(int index) {
+        if (woyouService == null) {
+            //Toast.makeText(context, R.string.toast_2,Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        int k = darkness[index];
+        try {
+            woyouService.sendRAWData(ESCUtil.setPrinterDarkness(k), null);
+            woyouService.printerSelfChecking(null);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 取得打印机系统信息，放在list中
+     *
+     * @return list
+     */
+    public List<String> getPrinterInfo() {
+        if (woyouService == null) {
+           // Toast.makeText(context,R.string.toast_2,Toast.LENGTH_LONG).show();
+            return null;
+        }
+
+        List<String> info = new ArrayList<>();
+        try {
+            info.add(woyouService.getPrinterSerialNo());
+            info.add(woyouService.getPrinterModal());
+            info.add(woyouService.getPrinterVersion());
+            info.add(woyouService.getPrintedLength()+"");
+            info.add("");
+            //info.add(woyouService.getServiceVersion());
+            PackageManager packageManager = context.getPackageManager();
+            try {
+                PackageInfo packageInfo = packageManager.getPackageInfo(SERVICE＿PACKAGE, 0);
+                if(packageInfo != null){
+                    info.add(packageInfo.versionName);
+                    info.add(packageInfo.versionCode+"");
+                }else{
+                    info.add("");info.add("");
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return info;
+    }
+
+    /**
+     * 初始化打印机
+     */
+    public void initPrinter() {
+        if (woyouService == null) {
+            //Toast.makeText(context,R.string.toast_2,Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        try {
+            woyouService.printerInit(null);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 打印文字
+     */
+    public void printText(String content, float size, boolean isBold, boolean isUnderLine) {
+        if (woyouService == null) {
+            //Toast.makeText(context,R.string.toast_2,Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        try {
+            if (isBold) {
+                woyouService.sendRAWData(ESCUtil.boldOn(), null);
+            } else {
+                woyouService.sendRAWData(ESCUtil.boldOff(), null);
+            }
+
+            if (isUnderLine) {
+                woyouService.sendRAWData(ESCUtil.underlineWithOneDotWidthOn(), null);
+            } else {
+                woyouService.sendRAWData(ESCUtil.underlineOff(), null);
+            }
+
+            woyouService.printTextWithFont(content, null, size, null);
+            woyouService.lineWrap(3, null);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /*
+     * 空打三行！
+     */
+    public void print3Line(){
+        if (woyouService == null) {
+            //Toast.makeText(context,R.string.toast_2,Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        try {
+            woyouService.lineWrap(3, null);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void sendRawData(byte[] data) {
         if (woyouService == null) {
-            //Toast.makeText(context,R.string.toast_2, Toast.LENGTH_LONG).show();
+            //Toast.makeText(context,R.string.toast_2,Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -140,6 +259,7 @@ public class AidlUtil {
             e.printStackTrace();
         }
     }
+
 
 
 }
