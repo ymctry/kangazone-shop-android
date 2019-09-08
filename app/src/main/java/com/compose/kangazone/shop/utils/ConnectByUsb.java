@@ -30,20 +30,17 @@ public class ConnectByUsb {
 
 
     //获取连接
-    public void getConnect(Context context, String deviceName) {
+    public void getConnect(Context context, int venderId) {
         usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
 
-        String targetDeviceName = deviceName;
         UsbDevice targetDevice = null;
         HashMap<String, UsbDevice> deviceMap = usbManager.getDeviceList();
-        Toast.makeText(context, deviceMap.toString(), Toast.LENGTH_LONG).show();
         for (UsbDevice device : deviceMap.values()) {
-            if (targetDeviceName.equals(device.getDeviceName())) {
+            if (venderId == device.getVendorId()) {
                 targetDevice = device;
                 break;
             }
         }
-        Toast.makeText(context, targetDevice.getInterfaceCount() + "", Toast.LENGTH_LONG).show();
         if (targetDevice.getInterfaceCount() == 0) {
             return;
         }
@@ -52,8 +49,7 @@ public class ConnectByUsb {
             UsbInterface intf = targetDevice.getInterface(i);
             // 之后我们会根据 intf的 getInterfaceClass 判断是哪种类型的Usb设备，
             // 并且结合 device.getVectorID() 或者厂家ID进行过滤，比如 UsbConstants.USB_CLASS_PRINTER
-            if (targetDevice.getVendorId() == UsbConstants.USB_CLASS_PRINTER &&
-                    intf.getInterfaceClass() == UsbConstants.USB_CLASS_PRINTER) {
+            if (intf.getInterfaceClass() == UsbConstants.USB_CLASS_PRINTER) {
                 // 这个device就是你要找的UsbDevice，此时还需要进行权限判断
                 if (!usbManager.hasPermission(targetDevice)) { // 没有权限
                     PendingIntent permissionIntent = PendingIntent.getBroadcast(context, 0, new Intent("com.android.example.USB_PERMISSION"), 0);
@@ -121,8 +117,7 @@ public class ConnectByUsb {
         }
     }
 
-    public void print(byte[] bytes) {
-
+    public void print(Context context, byte[] bytes) {
         new Thread(() -> {
             connection.bulkTransfer(outputEndPoint, bytes, bytes.length, 5000);
         }).start();

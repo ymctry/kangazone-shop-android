@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         binding.wvShop.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                 view.loadUrl(request.getUrl().toString());
+                view.loadUrl(request.getUrl().toString());
                 return true;
             }
 
@@ -153,22 +153,23 @@ public class MainActivity extends AppCompatActivity {
 
     // 获取打印机驱动
     @JavascriptInterface
-    public void jsGetDevice(String deviceName) {
-        connectByUsb = new ConnectByUsb();
-        connectByUsb.getConnect(this, deviceName);
+    public void jsGetDevice() {
+
     }
 
     // 打印
     @JavascriptInterface
-    public void jsPrint(String text) {
-        connectByUsb.print(BytesUtil.getBytesFromDecString(text));
+    public void jsPrint(String venderId, String text) {
+        connectByUsb = new ConnectByUsb();
+        connectByUsb.getConnect(this, Integer.parseInt(venderId));
+        connectByUsb.print(this, BytesUtil.getBytesFromDecString(text));
     }
 
     // 获取所有usb设备
     @JavascriptInterface
-    public String jsGetAllUSBDevices(){
+    public String jsGetAllUSBDevices() {
         UsbManager usbManager = (UsbManager) this.getSystemService(Context.USB_SERVICE);
-        return  usbManager.getDeviceList().toString();
+        return usbManager.getDeviceList().toString();
     }
 
     private void registerResultReceiver() {
