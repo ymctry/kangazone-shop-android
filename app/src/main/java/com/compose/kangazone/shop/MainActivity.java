@@ -162,7 +162,8 @@ public class MainActivity extends AppCompatActivity {
     public void jsPrint(String venderId, String text) {
         connectByUsb = new ConnectByUsb();
         connectByUsb.getConnect(this, Integer.parseInt(venderId));
-        connectByUsb.print(this, BytesUtil.getBytesFromDecString(text));
+
+        connectByUsb.print(this, BytesUtil.getBytesFromHexString(text));
     }
 
     // 获取所有usb设备
