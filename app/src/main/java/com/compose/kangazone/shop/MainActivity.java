@@ -163,6 +163,8 @@ public class MainActivity extends AppCompatActivity {
         connectByUsb = new ConnectByUsb();
         connectByUsb.getConnect(this, Integer.parseInt(venderId));
 
+        String str = BytesUtil.stringToHexString("测试打印abcd123");
+
         connectByUsb.print(this, BytesUtil.getBytesFromHexString(text));
     }
 

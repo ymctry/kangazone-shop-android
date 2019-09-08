@@ -50,6 +50,21 @@ public class BytesUtil {
 		}
 		return rv;
 	}
+	/**
+	 * 字符串转换为16进制字符串
+	 *
+	 * @param s
+	 * @return
+	 */
+	public static String stringToHexString(String s) {
+		String str = "";
+		for (int i = 0; i < s.length(); i++) {
+			int ch = s.charAt(i);
+			String s4 = Integer.toHexString(ch);
+			str = str + s4;
+		}
+		return str;
+	}
 
 	//十进制字符串转字节数组
 	@SuppressLint("DefaultLocale")
