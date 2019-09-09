@@ -54,8 +54,8 @@ public class ConnectByUsb {
                 if (!usbManager.hasPermission(targetDevice)) { // 没有权限
                     PendingIntent permissionIntent = PendingIntent.getBroadcast(context, 0, new Intent("com.android.example.USB_PERMISSION"), 0);
                     IntentFilter filter = new IntentFilter("com.android.example.USB_PERMISSION");
-                    context.registerReceiver(mUsbPermissionReceiver, filter);
                     usbManager.requestPermission(targetDevice, permissionIntent);
+                    context.registerReceiver(mUsbPermissionReceiver, filter);
                     return;
                 } else {
                     usbDeviceInit(targetDevice);

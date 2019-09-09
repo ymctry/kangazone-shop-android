@@ -47,10 +47,10 @@ public class MainActivity extends AppCompatActivity {
     private ResultReceiver resultReceiver;
     private ConnectByUsb connectByUsb;
 
-    private String isBack; // 0能返回，1不能返回
+    private String isBack = "0"; // 0能返回，1不能返回
 
-    private String url = "http://kangazone-shop.herokuapp.com/test";
-    //https://shop.kangazone.com
+    //private String url = "http://kangazone-shop.herokuapp.com/";
+    private String url = "https://shop.kangazone.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,9 +174,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void registerResultReceiver() {
-        resultReceiver = new ResultReceiver(result -> {
-            javaCallJS(result);
-        });
+        resultReceiver = new ResultReceiver(this::javaCallJS);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ResultReceiver.RESPONSE_ACTION);
         registerReceiver(resultReceiver, intentFilter);
@@ -190,16 +188,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @JavascriptInterface
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        String str = "{'resultCode':'-1','resultMsg':'isBack'}";
-        binding.wvShop.post(() -> binding.wvShop.evaluateJavascript("javascript:sendJSMessage('" + str + "')", value -> {
-            //此处为 js 返回的结果
-            isBack = value;
+        /*String str = "{\"resultCode\":\"-1'\",\"resultMsg\":\"isBack\"}";
+        binding.wvShop.post(() -> binding.wvShop.evaluateJavascript("javascript:sendJSMessage('" + str + "')", new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String value) {
+                //此处为 js 返回的结果
+                isBack = value;
+            }
         }));
-        if (isBack.equals("1")) {
-            finish();
+        if (isBack.equals("0")) {
+            return false;
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }*/
+        if (binding.wvShop.getUrl().equals(url)) {
+            return super.onKeyDown(keyCode, event);
+        } else {
+            return false;
+
         }
-        return super.onKeyDown(keyCode, event);
+
     }
 }
