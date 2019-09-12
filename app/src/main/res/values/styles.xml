@@ -3,8 +3,8 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="QMUI.Compat.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">?attr/qmui_config_color_blue</item>
-        <item name="colorPrimaryDark">?attr/qmui_config_color_blue</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimary</item>
         <item name="colorAccent">?attr/qmui_config_color_blue</item>
 
         <item name="QMUITopBarStyle">@style/QDTopBar</item>

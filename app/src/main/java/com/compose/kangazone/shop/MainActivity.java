@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
     @JavascriptInterface
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        /*String str = "{\"resultCode\":\"-1'\",\"resultMsg\":\"isBack\"}";
+        String str = "{\"resultCode\":\"-1\",\"resultMsg\":\"isBack\"}";
         binding.wvShop.post(() -> binding.wvShop.evaluateJavascript("javascript:sendJSMessage('" + str + "')", new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String value) {
@@ -203,13 +203,13 @@ public class MainActivity extends AppCompatActivity {
             return false;
         } else {
             return super.onKeyDown(keyCode, event);
-        }*/
-        if (binding.wvShop.getUrl().equals(url)) {
+        }
+        /*if (binding.wvShop.getUrl().equals(url)) {
             return super.onKeyDown(keyCode, event);
         } else {
             return false;
 
-        }
+        }*/
 
     }
 }
