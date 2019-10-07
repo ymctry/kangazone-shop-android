@@ -153,8 +153,9 @@ public class MainActivity extends AppCompatActivity {
 
     // 获取打印机驱动
     @JavascriptInterface
-    public void jsGetDevice() {
-
+    public void jsGetDevice(String venderId) {
+        connectByUsb = new ConnectByUsb();
+        connectByUsb.getConnect(this, Integer.parseInt(venderId));
     }
 
     // 打印
